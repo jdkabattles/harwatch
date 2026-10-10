@@ -1,0 +1,17 @@
+[project]
+name = "harwatch"
+version = "0.1.0"
+description = "Freeze an API from a HAR. Fail the build when a field disappears."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+
+[project.scripts]
+harwatch = "harwatch.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
