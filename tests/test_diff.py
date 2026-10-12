@@ -19,6 +19,16 @@ def test_removed_field_breaks():
     assert any("total" in item for item in breaks)
 
 
-def test_same_shape_passes():
+def test_later_call_does_not_drop_an_earlier_field():
+    har = {
+        "log": {"entries": [
+            {"request": {"method": "GET", "url": "https://a.test/v1/orders"},
+             "response": {"status": 200, "content": {"text": '{"id":1,"total":2}'}}},
+            {"request": {"method": "GET", "url": "https://a.test/v1/orders"},
+             "response": {"status": 200, "content": {"text": '{"id":1}'}}},
+        ]}
+    }
+    frozen = contract(har)
+    assert "total" in frozen["endpoints"]["GET /v1/orders"]["response"]
     old = contract(load(ROOT / "before.har"))
     assert diff(old, old) == []

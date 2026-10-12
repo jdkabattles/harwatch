@@ -32,13 +32,13 @@ def contract(har: dict[str, Any]) -> dict[str, Any]:
         query = sorted(
             name for name, _ in parse_qsl(parsed.query) if name.lower() not in SECRET_QUERY
         )
-        endpoints[key] = {
+        endpoints[key] = _merge(endpoints.get(key), {
             "host": parsed.netloc,
             "query": query,
             "status": res.get("status") or 0,
             "response": _shape(_json_or_none((res.get("content") or {}).get("text"))),
             "request": _shape(_json_or_none((req.get("postData") or {}).get("text"))),
-        }
+        })
     if not endpoints:
         raise ValueError("No HTTP calls in HAR")
     return {"version": 1, "endpoints": endpoints}
@@ -84,6 +84,31 @@ def _shape(value: Any) -> Any:
     if value is None:
         return "null"
     return "string"
+
+
+def _merge(prev: dict[str, Any] | None, cur: dict[str, Any]) -> dict[str, Any]:
+    if prev is None:
+        return cur
+    return {
+        "host": prev["host"] or cur["host"],
+        "query": sorted(set(prev["query"]) | set(cur["query"])),
+        "status": prev["status"] or cur["status"],
+        "response": _union(prev["response"], cur["response"]),
+        "request": _union(prev["request"], cur["request"]),
+    }
+
+
+def _union(old: Any, new: Any) -> Any:
+    if isinstance(old, dict) and isinstance(new, dict):
+        keys = set(old) | set(new)
+        return {key: _union(old.get(key), new.get(key)) for key in sorted(keys)}
+    if isinstance(old, list) and isinstance(new, list):
+        if not old:
+            return new
+        if not new:
+            return old
+        return [_union(old[0], new[0])]
+    return old if old is not None else new
 
 
 def _missing_fields(old: Any, new: Any, prefix: str = "") -> list[str]:
