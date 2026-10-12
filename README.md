@@ -14,6 +14,7 @@ harwatch check later.har --contract contract.json
 
 Free CLI is this repo. Hosted watch (scheduled re-record + Slack/email on break) is the paid product: **$29/month** per API.
 
-Stripe payment link goes here once you create it. Until then the free tool is the product.
+Paid watch: $29 a month. https://buy.stripe.com/4gMbIU3l1byy08H2xYffy02
+Page: https://forgingstack.com/harwatch/
 
 No customer recordings are stored in this repository.
