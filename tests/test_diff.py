@@ -19,6 +19,11 @@ def test_removed_field_breaks():
     assert any("total" in item for item in breaks)
 
 
+def test_same_shape_passes():
+    old = contract(load(ROOT / "before.har"))
+    assert diff(old, old) == []
+
+
 def test_later_call_does_not_drop_an_earlier_field():
     har = {
         "log": {"entries": [
