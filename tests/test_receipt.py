@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-
 from harwatch.receipt import build_receipt, render_text, sha256_json
 
 
