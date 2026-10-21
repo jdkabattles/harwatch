@@ -11,7 +11,7 @@ polling, no credential storage.
 1. **Waitlist** — customer emails with subject `harwatch watch - [API name]`.
    No checkout until delivery exists. Payment Link is unverified; do not use.
 2. **Intake** (see intake.md) — collect API name, endpoint URL (reference
-   only, NOT hit in MVP), contact email, optional Slack webhook, baseline
+   only, NOT hit in MVP), contact email, optional Slack webhook (set in the customer's own config at setup, never sent to us), baseline
    HAR, fields to watch. No credentials. Warn on Authorization header.
 3. **Freeze baseline** — operator runs `harwatch freeze baseline.har --out
    baseline.json`. Store the baseline contract + its SHA256. Delete the
