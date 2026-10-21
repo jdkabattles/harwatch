@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 from harwatch.parse import contract
 from harwatch.runner import run_check, scan_secrets
 
@@ -75,3 +77,29 @@ def test_runner_warns_on_secrets(tmp_path: Path) -> None:
 
 def test_scan_secrets_clean() -> None:
     assert scan_secrets(har([entry("https://api.example/items", {"id": 1})])) == []
+
+
+def test_runner_deletes_submitted_har_on_success(tmp_path: Path) -> None:
+    base_har = har([entry("https://api.example/items", {"id": 1, "name": "x"})])
+    baseline_p = write(tmp_path, "baseline.json", contract(base_har))
+    har_p = write(
+        tmp_path,
+        "submitted.har",
+        har([entry("https://api.example/items", {"id": 1, "name": "x"})]),
+    )
+    receipt, _ = run_check(baseline_p, har_p)
+    assert receipt["result"] == "PASS"
+    # S5: the submitted HAR is gone after the check; the baseline stays.
+    assert not har_p.exists()
+    assert baseline_p.exists()
+
+
+def test_runner_deletes_submitted_har_on_check_error(tmp_path: Path) -> None:
+    base_har = har([entry("https://api.example/items", {"id": 1})])
+    baseline_p = write(tmp_path, "baseline.json", contract(base_har))
+    bad = tmp_path / "submitted.har"
+    bad.write_text("{ not json")
+    with pytest.raises(Exception):
+        run_check(baseline_p, bad)
+    # S5: even a malformed submission is not left on disk.
+    assert not bad.exists()
