@@ -40,24 +40,31 @@ def scan_secrets(har: dict[str, Any]) -> list[str]:
 def run_check(
     baseline_path: str | Path, har_path: str | Path
 ) -> tuple[dict[str, Any], list[str]]:
-    baseline = json.loads(Path(baseline_path).read_text())
-    baseline_hash = sha256_json(baseline)
-    har_hash = sha256_file(str(har_path))
-    har = load(har_path)
-    warnings = scan_secrets(har)
-    new = contract(har)
-    breaks = diff(baseline, new)
-    ts = datetime.now(timezone.utc)
-    check_id = f"hw-{ts.strftime('%Y%m%dT%H%M%SZ')}-{har_hash[:8]}"
-    receipt = build_receipt(
-        baseline=baseline,
-        baseline_hash=baseline_hash,
-        har_hash=har_hash,
-        breaks=breaks,
-        check_id=check_id,
-        timestamp=ts.isoformat(),
-    )
-    return receipt, warnings
+    submitted = Path(har_path)
+    try:
+        baseline = json.loads(Path(baseline_path).read_text())
+        baseline_hash = sha256_json(baseline)
+        har_hash = sha256_file(str(submitted))
+        har = load(submitted)
+        warnings = scan_secrets(har)
+        new = contract(har)
+        breaks = diff(baseline, new)
+        ts = datetime.now(timezone.utc)
+        check_id = f"hw-{ts.strftime('%Y%m%dT%H%M%SZ')}-{har_hash[:8]}"
+        receipt = build_receipt(
+            baseline=baseline,
+            baseline_hash=baseline_hash,
+            har_hash=har_hash,
+            breaks=breaks,
+            check_id=check_id,
+            timestamp=ts.isoformat(),
+        )
+        return receipt, warnings
+    finally:
+        # S5 (HAR delete-after-check): the submitted HAR is deleted on every
+        # path out of the check — pass, fail verdict, or exception — so a
+        # customer file is never left on disk. The receipt keeps hashes only.
+        submitted.unlink(missing_ok=True)
 
 
 def main() -> None:
