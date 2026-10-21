@@ -12,9 +12,6 @@ harwatch check later.har --contract contract.json
 
 ## Money
 
-Free CLI is this repo. Hosted watch (scheduled re-record + Slack/email on break) is the paid product: **$29/month** per API.
+Free CLI is this repo. A hosted watch is planned at **$29/month** per API — one API, one baseline, up to 30 scheduled checks a month, Slack/email notice on break, GOLD receipt per check.
 
-Paid watch: $29 a month. https://buy.stripe.com/4gMbIU3l1byy08H2xYffy02
-Page: https://forgingstack.com/harwatch/
-
-No customer recordings are stored in this repository.
+**Waitlist only.** There is no checkout and no paid product until delivery exists, and the MVP is a scheduled check, not a re-record. See `docs/mvp.md` and `docs/intake.md`.
