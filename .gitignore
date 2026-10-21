@@ -1,2 +1,5 @@
 __pycache__/
 *.py[cod]
+
+# Customer HAR recordings can contain API traffic and secrets - never commit them.
+*.har
